@@ -1,0 +1,30 @@
+{
+  "name": "zoodubbo",
+  "version": "1.0.0",
+  "description": "A nodejs lib to connect dubbo service by zookeeper client.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Corey600/zoodubbo.git"
+  },
+  "keywords": [
+    "nodejs",
+    "dubbo",
+    "zookeeper"
+  ],
+  "author": "Corey600",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Corey600/zoodubbo/issues"
+  },
+  "homepage": "https://github.com/Corey600/zoodubbo#readme",
+  "dependencies": {
+    "hessian.js": "^2.1.8",
+    "js-to-java": "^2.4.0",
+    "node-zookeeper-client": "^0.2.2",
+    "node-zookeeper-dubbo": "^1.6.21"
+  }
+}
