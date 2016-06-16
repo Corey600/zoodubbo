@@ -2,6 +2,6 @@
  * Created by Corey600 on 2016/6/15.
  */
 
-var Service = require('./lib/service');
+'use strict';
 
-var ZD = module.exports = Service;
+var ZD = module.exports = require('./lib/zd');

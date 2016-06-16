@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Corey600/zoodubbo#readme",
   "dependencies": {
+    "co": "^4.6.0",
     "hessian.js": "^2.1.8",
     "js-to-java": "^2.4.0",
     "node-zookeeper-client": "^0.2.2",
