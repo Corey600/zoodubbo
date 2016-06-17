@@ -15,4 +15,4 @@ script:
     - "npm run test"
 
 # 在脚本运行完后的命令，这里把travis结果提交给coverage
-# after_script: "npm install coveralls && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+after_script: "npm install coveralls && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"

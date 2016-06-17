@@ -1,6 +1,7 @@
 # zoodubbo
 
 [![Build Status](https://api.travis-ci.org/Corey600/zoodubbo.svg)](http://travis-ci.org/Corey600/zoodubbo)
+[![Coveralls](https://img.shields.io/coveralls/Corey600/zoodubbo.svg)](https://coveralls.io/github/Corey600/zoodubbo)
 [![NPM Version](http://img.shields.io/npm/v/zoodubbo.svg?style=flat)](https://www.npmjs.org/package/zoodubbo)
 [![NPM Downloads](https://img.shields.io/npm/dm/zoodubbo.svg?style=flat)](https://www.npmjs.org/package/zoodubbo)
 [![GitHub stars](https://img.shields.io/github/stars/Corey600/zoodubbo.svg?style=flat&label=Star)](https://github.com/Corey600/zoodubbo)
