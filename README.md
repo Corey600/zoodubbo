@@ -1,9 +1,9 @@
 # zoodubbo
 
-[![Build Status](https://api.travis-ci.org/tj/commander.js.svg)](http://travis-ci.org/tj/commander.js)
+[![Build Status](https://api.travis-ci.org/Corey600/zoodubbo.svg)](http://travis-ci.org/Corey600/zoodubbo)
 [![NPM Version](http://img.shields.io/npm/v/zoodubbo.svg?style=flat)](https://www.npmjs.org/package/zoodubbo)
 [![NPM Downloads](https://img.shields.io/npm/dm/zoodubbo.svg?style=flat)](https://www.npmjs.org/package/zoodubbo)
-[![GitHub stars](https://img.shields.io/github/stars/Corey600/zoodubbo.svg?style=flat&label=Stars)](https://github.com/Corey600/zoodubbo)
+[![GitHub stars](https://img.shields.io/github/stars/Corey600/zoodubbo.svg?style=flat&label=Star)](https://github.com/Corey600/zoodubbo)
 
 A Javascript module for 
 [Node.js](http://nodejs.org)

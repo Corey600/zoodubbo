@@ -4,7 +4,7 @@
   "description": "A Javascript module for Node.js to connect Dubbo service by node-zookeeper-client.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --harmony --reporter list --ui bdd -c --timeout 5000 test/*.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,8 @@
   "dependencies": {
     "hessian.js": "^2.1.8",
     "node-zookeeper-client": "^0.2.2"
+  },
+  "devDependencies": {
+    "mocha": "^2.5.3"
   }
 }
