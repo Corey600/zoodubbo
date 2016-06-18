@@ -50,3 +50,9 @@ service.excute(method, [arg1], function (err, data) {
     console.log(data)
 });
 ```
+
+## Thanks
+
+Thank 
+[node-zookeeper-dubbo](https://github.com/p412726700/node-zookeeper-dubbo)
+provide reference and thoughts.
