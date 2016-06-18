@@ -1,6 +1,6 @@
 {
   "name": "zoodubbo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A Javascript module for Node.js to connect Dubbo service by node-zookeeper-client.",
   "main": "index.js",
   "scripts": {
