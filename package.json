@@ -4,7 +4,7 @@
   "description": "A Javascript module for Node.js to connect Dubbo service by node-zookeeper-client.",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --colors test/*.js",
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --colors test/*.js",
     "coverage": "cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.9",
+    "expect.js": "^0.3.1",
     "istanbul": "^0.4.3",
     "mocha": "^2.5.3"
   }

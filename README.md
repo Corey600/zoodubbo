@@ -22,7 +22,6 @@ $ npm install zoodubbo
 ## Example
 
 ```javascript
-
 var ZD = require('zoodubbo');
 
 var zd = new ZD({
