@@ -41,7 +41,7 @@ describe('/lib/service', function () {
                     done();
                     return;
                 }
-                console.log('data:' + data);
+                expect(data).to.be(undefined);
                 done();
             });
         });
