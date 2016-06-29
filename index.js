@@ -138,9 +138,9 @@ ZD.prototype.getProvider = function (path, version, cb) {
             };
             self._cache[path] = provider;
         } catch (err) {
-            cb(err);
+            return cb(err);
         }
 
-        cb(false, provider);
+        return cb(false, provider);
     });
 };
