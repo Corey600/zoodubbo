@@ -4,14 +4,15 @@
 
 'use strict';
 
+// require core modules
 var url = require('url');
-var debug = require('debug');
 var querystring = require('querystring');
+
+// require thirdpart modules
 var zookeeper = require('node-zookeeper-client');
 
-var Service = require('./lib/service');
-
-var error = debug('zoodubbo:error');
+// require custom modules
+var Invoker = require('./lib/invoker');
 
 /**
  * Expose `ZD`.
@@ -21,16 +22,16 @@ var error = debug('zoodubbo:error');
 module.exports = ZD;
 
 /**
- * Constructor of Registry.
+ * Constructor of ZD.
  *
  * @param {Object} conf
  * {
- *  dubbo: string // dubbo version information
+ *  dubbo: String // dubbo version information
  *
  *  // The following content could reference:
  *  //     https://github.com/alexguan/node-zookeeper-client#client-createclientconnectionstring-options
  *
- *  conn: string, // Comma separated host:port pairs, each represents a ZooKeeper server
+ *  conn: String, // Comma separated host:port pairs, each represents a ZooKeeper server
  *  sessionTimeout: Number, // Session timeout in milliseconds, defaults to 30 seconds.
  *  spinDelay: Number, // The delay (in milliseconds) between each connection attempts.
  *  retries: Number // The number of retry attempts for connection loss exception.
@@ -40,66 +41,57 @@ module.exports = ZD;
  */
 function ZD(conf) {
     if (!(this instanceof ZD)) return new ZD(conf);
+    conf = conf || {};
     this._dubbo = conf.dubbo;
     this._conn = conf.conn;
-    this._opt = {
-        sessionTimeout: conf.sessionTimeout || 30000,
-        spinDelay: conf.spinDelay || 1000,
-        retries: conf.retries || 5
-    };
-    this._cache = {};
+    this._client = this.client = zookeeper.createClient(this._conn, {
+        sessionTimeout: conf.sessionTimeout,
+        spinDelay: conf.spinDelay,
+        retries: conf.retries
+    });
+
+    this._cache = this.cache = {};
 }
 
 /**
- * Connect zookeeper
+ * Connect zookeeper.
  *
- * @param conn
  * @public
  */
-ZD.prototype.connect = function (conn) {
-    var self = this;
-    conn && (self._conn = conn);
-
-    // close old connection before new connection
-    self.close();
-
-    self._client = self.client = zookeeper.createClient(self._conn, self._opt);
-    self._client.connect();
+ZD.prototype.connect = function () {
+    if (!this._client || !this._client.connect) {
+        return;
+    }
+    this._client.connect();
 };
 
 /**
- * Close connection
+ * Close connection.
  *
  * @public
  */
 ZD.prototype.close = function () {
-    var self = this;
-    if (!self._client || !self._client.close) {
+    if (!this._client || !this._client.close) {
         return;
     }
-    var state = self._client.getState();
-    if (state == zookeeper.State.CONNECTED
-        || state == zookeeper.State.CONNECTED_READ_ONLY) {
-        this._client.close();
-    }
+    this._client.close();
 };
 
 /**
- * Get a service
+ * Get a invoker.
  *
- * @param path
- * @param opt
+ * @param {String} path
+ * @param {Object} [opt]
  * {
- *  version: string // service version
- *  timeout: number
+ *  version: String
+ *  timeout: Number
  * }
- * @returns {Service}
+ * @returns {Invoker}
  * @public
  */
-ZD.prototype.getService = function (path, opt) {
-    var self = this;
+ZD.prototype.getInvoker = function (path, opt) {
     opt = opt || {};
-    return new Service(self, {
+    return new Invoker(this, {
         path: path,
         timeout: opt.timeout,
         version: (opt.version || '0.0.0').toUpperCase()
@@ -107,59 +99,48 @@ ZD.prototype.getService = function (path, opt) {
 };
 
 /**
- * Get a zoo from client
+ * Get a provider from the registry.
  *
- * @param path
- * @param version
- * @param cb
+ * @param {String} path
+ * @param {String} version
+ * @param {Function} cb
  * @returns {*}
  * @public
  */
-ZD.prototype.getZooFromClient = function (path, version, cb) {
+ZD.prototype.getProvider = function (path, version, cb) {
     var self = this;
     var _path = '/dubbo/' + path + '/providers';
-    self.client.getChildren(_path, function (error, children) {
-        var zoo, parsed;
-        if (error) {
-            if (error.getCode() === zookeeper.Exception.CONNECTION_LOSS) {
-                error(error);
-            }
-            return cb(error);
+    self._client.getChildren(_path, function (err, children) {
+        var child, parsed, provider, i, l;
+        if (err) {
+            return cb(err);
         }
+
         if (children && !children.length) {
-            return cb('can\'t find  the zoo: ' + path + ' ,please check dubbo service!');
+            return cb('Can\'t find children from the node: ' + _path +
+                ' ,please check the path!');
         }
 
         try {
-            for (var i = 0, l = children.length; i < l; i++) {
-                zoo = querystring.parse(decodeURIComponent(children[i]));
-                if (zoo.version === version) {
+            for (i = 0, l = children.length; i < l; i++) {
+                child = querystring.parse(decodeURIComponent(children[i]));
+                //console.log(child);
+                if (child.version === version) {
                     break;
                 }
             }
-            // Get the first zoo
-            parsed = url.parse(Object.keys(zoo)[0]);
-            zoo = {
+
+            parsed = url.parse(Object.keys(child)[0]);
+            provider = {
                 host: parsed.hostname,
                 port: parsed.port,
-                methods: zoo.methods.split(',')
+                methods: child.methods.split(',')
             };
-            self._cache[path] = zoo;
-            cb(null, zoo);
+            self._cache[path] = provider;
         } catch (err) {
             cb(err);
         }
-    });
-};
 
-/**
- * Get a zoo from cache
- *
- * @param path
- * @returns {*}
- * @public
- */
-ZD.prototype.getZooFromCache = function (path) {
-    var self = this;
-    return self._cache[path];
+        cb(false, provider);
+    });
 };

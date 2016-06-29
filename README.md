@@ -25,7 +25,7 @@ $ npm install zoodubbo
 var ZD = require('zoodubbo');
 
 var zd = new ZD({
-    conn: 'localhost:2181',
+    conn: 'localhost:2181,localhost:2182',
     dobbo: '2.5.3'
 });
 
@@ -35,12 +35,12 @@ zd.client.on('connected', function connect() {
     console.log('zookeeper client connected!');
 });
 
-var service = zd.getService('com.demo.Service');
+var invoker = zd.getInvoker('com.demo.Service');
 
 var method = 'getUserByID';
 var arg1={$class:'int',$:123};
 
-service.excute(method, [arg1], function (err, data) {
+invoker.excute(method, [arg1], function (err, data) {
     console.log('excute');
     if (err) {
         console.log(err);
