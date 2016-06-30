@@ -55,7 +55,26 @@ invoker.excute(method, [arg1], function (err, data) {
 
 ## Documentation
 
-### ZD
+### new ZD(conf)
+
+*Arguments*
+
+* conf
+
+    * `dubbo` Dubbo version information.
+    * `conn` Comma separated host:port pairs, each represents a ZooKeeper server.
+    * `sessionTimeout` Session timeout in milliseconds, defaults to 30 seconds.
+    * `spinDelay` The delay (in milliseconds) between each connection attempts.
+    * `retries` The number of retry attempts for connection loss exception.
+
+*Example*
+
+```javascript
+var zd = new ZD({
+    conn: 'localhost:2181,localhost:2182',
+    dubbo: '2.5.3'
+});
+```
 
 ----
 
@@ -78,6 +97,12 @@ zd.client.on('connected', function connect() {
 ----
 
 #### getInvoker
+
+----
+
+## Invoker
+
+### excute
 
 ----
 
