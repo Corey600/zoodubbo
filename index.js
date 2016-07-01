@@ -110,7 +110,7 @@ ZD.prototype.getInvoker = function (path, opt) {
 ZD.prototype.getProvider = function (path, version, cb) {
     var self = this;
     var _path = '/dubbo/' + path + '/providers';
-    self._client.getChildren(_path, function (err, children) {
+    return self._client.getChildren(_path, function (err, children) {
         var child, parsed, provider, i, l;
         if (err) {
             return cb(err);
