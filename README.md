@@ -59,13 +59,15 @@ invoker.excute(method, [arg1], function (err, data) {
 
 *Arguments*
 
-* conf
+* conf {*Object*} - An object to set the instance options. Currently available options are:
 
-    * `dubbo` Dubbo version information.
-    * `conn` Comma separated host:port pairs, each represents a ZooKeeper server.
-    * `sessionTimeout` Session timeout in milliseconds, defaults to 30 seconds.
-    * `spinDelay` The delay (in milliseconds) between each connection attempts.
-    * `retries` The number of retry attempts for connection loss exception.
+    * `dubbo` {*String*} - Dubbo version information.
+
+    *The following content could reference: [https://github.com/alexguan/node-zookeeper-client#client-createclientconnectionstring-options](https://github.com/alexguan/node-zookeeper-client#client-createclientconnectionstring-options)*
+    * `conn` {*String*} - Just like connectionString of [node-zookeeper-client](https://github.com/alexguan/node-zookeeper-client). Comma separated host:port pairs, each represents a ZooKeeper server.
+    * `sessionTimeout` {*Number*} - Session timeout in milliseconds, defaults to 30 seconds.
+    * `spinDelay` {*Number*} - The delay (in milliseconds) between each connection attempts.
+    * `retries` {*Number*} - The number of retry attempts for connection loss exception.
 
 *Example*
 
@@ -80,29 +82,95 @@ var zd = new ZD({
 
 #### client
 
+The client instance created by [node-zookeeper-client](https://github.com/alexguan/node-zookeeper-client). To listen event such as follows:
+
 ```javascript
 zd.client.on('connected', function connect() {
     console.log('zookeeper client connected!');
 });
 ```
 
-----
-
-#### connect
+The list of events could reference: [https://github.com/alexguan/node-zookeeper-client#state](https://github.com/alexguan/node-zookeeper-client#state)
 
 ----
 
-#### close
+#### void connect()
+
+Connect to the Dubbo Registration Center by [node-zookeeper-client](https://github.com/alexguan/node-zookeeper-client). Equivalent to the following code:
+
+```javascript
+zd.connect();
+// just like
+zd.client.connect();
+```
 
 ----
 
-#### getInvoker
+#### void close()
+
+Close the connection of [node-zookeeper-client](https://github.com/alexguan/node-zookeeper-client). Equivalent to the following code:
+
+```javascript
+zd.close();
+// just like
+zd.client.close();
+```
+
+----
+
+#### Invoker getInvoker(path, opt)
+
+*Arguments*
+
+* path {*String*} - Path of service.
+* opt {*Object*} - An object to set the Invoker options. Currently available options are:
+
+    * `version` {*String*} - Service version information.
+    * `timeout` {*Number*} - The timeout (in milliseconds) to excute.
+
+*Example*
+
+```javascript
+var invoker = zd.getInvoker('com.demo.Service', {
+    version: '0.0.0'
+});
+```
 
 ----
 
 ## Invoker
 
-### excute
+### void excute(method, args, cb)
+
+*Arguments*
+
+* method {*String*} - Method to excute.
+* args {*Array*} - Argument list.
+* `[`cb(err, data)`]` {*Function*} - The data is the returned value. When the cb is undefined, the function return a Promise instance.
+
+*Example*
+
+```javascript
+var method = 'getUserByID';
+var arg1={$class:'int',$:123};
+
+// use callback
+invoker.excute(method, [arg1], function (err, data) {
+    if (err) {
+        console.log(err);
+        return;
+    }
+    console.log(data)
+});
+
+// or return a Promise instance
+invoker.excute(method, [arg1])
+    .then(function(data){
+        console.log(data);
+    }).catch(function(err){
+        console.log(err);
+    });
+```
 
 ----
 
