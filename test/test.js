@@ -92,7 +92,7 @@ describe('test', function () {
             });
             var err = null;
             try{
-                var zd = ZD();
+                var zd = ZD(null);
                 zd.connect();
                 zd.close();
             }catch(e){
@@ -113,7 +113,7 @@ describe('test', function () {
                 return zp;
             });
 
-            var zd = ZD();
+            var zd = ZD(null);
             zd.connect();
 
             var invoker = zd.getInvoker('com.demo.Service');
@@ -139,7 +139,7 @@ describe('test', function () {
                 return zp;
             });
 
-            var zd = ZD();
+            var zd = ZD(null);
             zd.connect();
 
             var invoker = zd.getInvoker('com.demo.Service');
@@ -165,7 +165,7 @@ describe('test', function () {
                 return zp;
             });
 
-            var zd = ZD();
+            var zd = ZD(null);
             zd.connect();
 
             var invoker = zd.getInvoker('com.demo.Service');
@@ -214,11 +214,12 @@ describe('test', function () {
             mm(zookeeper, 'createClient', function(conn, opt){
                 return new MyZookeeper(conn, opt);
             });
+            //noinspection JSUnresolvedVariable
             mm(MySocket.prototype, 'destroy', function(){
                 this.emit('close', true);
             });
 
-            var zd = ZD();
+            var zd = ZD(null);
             zd.connect();
 
             var invoker = zd.getInvoker('com.demo.Service');
@@ -242,7 +243,7 @@ describe('test', function () {
             mm(zookeeper, 'createClient', function(conn, opt){
                 return new MyZookeeper(conn, opt);
             });
-            zd = new ZD();
+            zd = new ZD(null);
             zd.connect();
             invoker = zd.getInvoker('com.demo.Service');
             done();
