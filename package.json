@@ -1,9 +1,13 @@
 {
   "name": "zoodubbo",
   "version": "0.1.1",
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "description": "A Javascript module for Node.js to connect Dubbo service by node-zookeeper-client.",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint lib test example index.js --config .eslintrc --ext .js",
     "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha --colors test/*.js",
     "coverage": "cat ./coverage/lcov.info | coveralls"
   },
@@ -26,10 +30,13 @@
   "dependencies": {
     "debug": "^2.2.0",
     "hessian.js": "^2.1.8",
-    "node-zookeeper-client": "^0.2.2"
+    "node-zookeeper-client": "^0.2.2",
+    "safe-buffer": "^5.1.1"
   },
   "devDependencies": {
     "coveralls": "^2.11.9",
+    "eslint": "^4.6.1",
+    "eslint-plugin-node": "^5.1.1",
     "expect.js": "^0.3.1",
     "istanbul": "^0.4.3",
     "mm": "^1.5.0",

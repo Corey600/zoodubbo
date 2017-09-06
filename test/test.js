@@ -14,6 +14,7 @@ var net = require('net');
 var zookeeper = require('node-zookeeper-client');
 var expect = require('expect.js');
 var mm = require('mm');
+var Buffer = require('safe-buffer').Buffer;
 
 // require custom modules
 var MySocket = require('./lib/socket');

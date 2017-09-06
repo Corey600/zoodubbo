@@ -2,8 +2,9 @@
  * Created by Corey600 on 2016/6/18.
  */
 
-const util = require('util');
-const EventEmitter = require('events').EventEmitter;
+var util = require('util');
+var EventEmitter = require('events').EventEmitter;
+var Buffer = require('safe-buffer').Buffer;
 
 var retrys = 1;
 

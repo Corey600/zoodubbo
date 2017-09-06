@@ -1,0 +1,22 @@
+{
+  "extends": ["eslint:recommended", "plugin:node/recommended"],
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "node/exports-style": ["error", "module.exports"],
+    "linebreak-style": ["error", "unix"],
+    "node/no-unpublished-require": ["error", {
+      "allowModules": ["expect.js", "mm"]
+    }]
+  },
+  "plugins": ["node"],
+  "globals": {
+    "beforeEach": true,
+    "afterEach": true,
+    "before": true,
+    "after": true,
+    "it": true,
+    "describe": true
+  }
+}
