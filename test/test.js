@@ -311,6 +311,18 @@ describe('test', function () {
       });
     });
 
+    it('serialization protocol', function (done) {
+      var codec = new Codec();
+      codec.clearChunk();
+      codec.pushChunk(new Buffer([0xda, 0xbb, 0x22, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x92]));
+      codec.decodeResponse(function (err, data) {
+        expect(err).to.be(false);
+        expect(data).to.be(undefined);
+        done();
+      });
+    });
+
     it('Unknown serialization protocol', function (done) {
       var codec = new Codec();
       codec.clearChunk();
