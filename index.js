@@ -15,13 +15,6 @@ var zookeeper = require('node-zookeeper-client');
 var Invoker = require('./lib/invoker');
 
 /**
- * Expose `ZD`.
- *
- * @type {ZD}
- */
-module.exports = ZD;
-
-/**
  * Constructor of ZD.
  *
  * @param {Object} conf
@@ -40,17 +33,19 @@ module.exports = ZD;
  * @constructor
  */
 function ZD(conf) {
-    if (!(this instanceof ZD)) return new ZD(conf);
-    conf = conf || {};
-    this._dubbo = conf.dubbo;
-    this._conn = conf.conn;
-    this._client = this.client = zookeeper.createClient(this._conn, {
-        sessionTimeout: conf.sessionTimeout,
-        spinDelay: conf.spinDelay,
-        retries: conf.retries
-    });
+  if (!(this instanceof ZD)) return new ZD(conf);
+  var config = conf || {};
+  this._dubbo = config.dubbo;
+  this._conn = config.conn;
+  this._client = zookeeper.createClient(this._conn, {
+    sessionTimeout: config.sessionTimeout,
+    spinDelay: config.spinDelay,
+    retries: config.retries
+  });
+  this.client = this._client;
 
-    this._cache = this.cache = {};
+  this._cache = {};
+  this.cache = this._cache;
 }
 
 /**
@@ -59,10 +54,10 @@ function ZD(conf) {
  * @public
  */
 ZD.prototype.connect = function () {
-    if (!this._client || !this._client.connect) {
-        return;
-    }
-    this._client.connect();
+  if (!this._client || !this._client.connect) {
+    return;
+  }
+  this._client.connect();
 };
 
 /**
@@ -71,10 +66,10 @@ ZD.prototype.connect = function () {
  * @public
  */
 ZD.prototype.close = function () {
-    if (!this._client || !this._client.close) {
-        return;
-    }
-    this._client.close();
+  if (!this._client || !this._client.close) {
+    return;
+  }
+  this._client.close();
 };
 
 /**
@@ -90,12 +85,12 @@ ZD.prototype.close = function () {
  * @public
  */
 ZD.prototype.getInvoker = function (path, opt) {
-    opt = opt || {};
-    return new Invoker(this, {
-        path: path,
-        timeout: opt.timeout,
-        version: (opt.version || '0.0.0').toUpperCase()
-    });
+  var option = opt || {};
+  return new Invoker(this, {
+    path: path,
+    timeout: option.timeout,
+    version: (option.version || '0.0.0').toUpperCase()
+  });
 };
 
 /**
@@ -108,39 +103,50 @@ ZD.prototype.getInvoker = function (path, opt) {
  * @public
  */
 ZD.prototype.getProvider = function (path, version, cb) {
-    var self = this;
-    var _path = '/dubbo/' + path + '/providers';
-    return self._client.getChildren(_path, function (err, children) {
-        var child, parsed, provider, i, l;
-        if (err) {
-            return cb(err);
+  var self = this;
+  var _path = '/dubbo/' + path + '/providers';
+  return self._client.getChildren(_path, function (err, children) {
+    var child;
+    var parsed;
+    var provider;
+    var i;
+    var l;
+    if (err) {
+      return cb(err);
+    }
+
+    if (children && !children.length) {
+      return cb('Can\'t find children from the node: ' + _path +
+          ' ,please check the path!');
+    }
+
+    try {
+      for (i = 0, l = children.length; i < l; i += 1) {
+        child = querystring.parse(decodeURIComponent(children[i]));
+        // console.log(child);
+        if (child.version === version) {
+          break;
         }
+      }
 
-        if (children && !children.length) {
-            return cb('Can\'t find children from the node: ' + _path +
-                ' ,please check the path!');
-        }
+      parsed = url.parse(Object.keys(child)[0]);
+      provider = {
+        host: parsed.hostname,
+        port: parsed.port,
+        methods: child.methods.split(',')
+      };
+      self._cache[path] = provider;
+    } catch (e) {
+      return cb(e);
+    }
 
-        try {
-            for (i = 0, l = children.length; i < l; i++) {
-                child = querystring.parse(decodeURIComponent(children[i]));
-                //console.log(child);
-                if (child.version === version) {
-                    break;
-                }
-            }
-
-            parsed = url.parse(Object.keys(child)[0]);
-            provider = {
-                host: parsed.hostname,
-                port: parsed.port,
-                methods: child.methods.split(',')
-            };
-            self._cache[path] = provider;
-        } catch (err) {
-            return cb(err);
-        }
-
-        return cb(false, provider);
-    });
+    return cb(false, provider);
+  });
 };
+
+/**
+ * Expose `ZD`.
+ *
+ * @type {ZD}
+ */
+module.exports = ZD;
