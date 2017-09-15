@@ -4,10 +4,6 @@
 
 'use strict';
 
-// require core modules
-var url = require('url');
-var querystring = require('querystring');
-
 // require thirdpart modules
 var zookeeper = require('node-zookeeper-client');
 
@@ -17,9 +13,9 @@ var Invoker = require('./lib/invoker');
 /**
  * Constructor of ZD.
  *
- * @param {Object} conf
+ * @param {String|Object} conf // A String of host:port pairs or an object to set options.
  * {
- *  dubbo: String // dubbo version information
+ *  dubbo: String // Dubbo version information.
  *
  *  // The following content could reference:
  *  //     https://github.com/alexguan/node-zookeeper-client#client-createclientconnectionstring-options
@@ -34,18 +30,13 @@ var Invoker = require('./lib/invoker');
  */
 function ZD(conf) {
   if (!(this instanceof ZD)) return new ZD(conf);
-  var config = conf || {};
-  this._dubbo = config.dubbo;
-  this._conn = config.conn;
-  this._client = zookeeper.createClient(this._conn, {
+  var config = ('string' === typeof conf) ? { conn: conf } : (conf || {});
+  this.dubbo = config.dubbo;
+  this.client = zookeeper.createClient(config.conn, {
     sessionTimeout: config.sessionTimeout,
     spinDelay: config.spinDelay,
     retries: config.retries
   });
-  this.client = this._client;
-
-  this._cache = {};
-  this.cache = this._cache;
 }
 
 /**
@@ -54,10 +45,10 @@ function ZD(conf) {
  * @public
  */
 ZD.prototype.connect = function () {
-  if (!this._client || !this._client.connect) {
+  if (!this.client || !this.client.connect) {
     return;
   }
-  this._client.connect();
+  this.client.connect();
 };
 
 /**
@@ -66,10 +57,10 @@ ZD.prototype.connect = function () {
  * @public
  */
 ZD.prototype.close = function () {
-  if (!this._client || !this._client.close) {
+  if (!this.client || !this.client.close) {
     return;
   }
-  this._client.close();
+  this.client.close();
 };
 
 /**
@@ -80,69 +71,30 @@ ZD.prototype.close = function () {
  * {
  *  version: String
  *  timeout: Number
+ *  poolMax: Number
+ *  poolMin: Number
  * }
  * @returns {Invoker}
  * @public
  */
 ZD.prototype.getInvoker = function (path, opt) {
+  var self = this;
   var option = opt || {};
-  return new Invoker(this, {
+  return new Invoker(self.client, {
     path: path,
+    dubbo: self.dubbo,
     timeout: option.timeout,
-    version: (option.version || '0.0.0').toUpperCase()
+    version: option.version,
+    poolMax: option.poolMax,
+    poolMin: option.poolMin
   });
 };
 
 /**
- * Get a provider from the registry.
- *
- * @param {String} path
- * @param {String} version
- * @param {Function} cb
- * @returns {*}
- * @public
+ * Expose `Invoker`. To create a Invoker with URIs directly.
+ * @type {Invoker}
  */
-ZD.prototype.getProvider = function (path, version, cb) {
-  var self = this;
-  var _path = '/dubbo/' + path + '/providers';
-  return self._client.getChildren(_path, function (err, children) {
-    var child;
-    var parsed;
-    var provider;
-    var i;
-    var l;
-    if (err) {
-      return cb(err);
-    }
-
-    if (children && !children.length) {
-      return cb('Can\'t find children from the node: ' + _path +
-          ' ,please check the path!');
-    }
-
-    try {
-      for (i = 0, l = children.length; i < l; i += 1) {
-        child = querystring.parse(decodeURIComponent(children[i]));
-        // console.log(child);
-        if (child.version === version) {
-          break;
-        }
-      }
-
-      parsed = url.parse(Object.keys(child)[0]);
-      provider = {
-        host: parsed.hostname,
-        port: parsed.port,
-        methods: child.methods.split(',')
-      };
-      self._cache[path] = provider;
-    } catch (e) {
-      return cb(e);
-    }
-
-    return cb(false, provider);
-  });
-};
+ZD.Invoker = Invoker;
 
 /**
  * Expose `ZD`.

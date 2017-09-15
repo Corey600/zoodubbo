@@ -9,31 +9,37 @@ var Buffer = require('safe-buffer').Buffer;
 var retrys = 1;
 
 function MySocket() {
-  this._buffer = null;
   EventEmitter.call(this);
 }
 
 util.inherits(MySocket, EventEmitter);
 
 MySocket.prototype.connect = function (port, host, cb) {
-  setTimeout(function () { cb(); }, 50);
+  this.on('connect', cb);
+  var self = this;
+  setImmediate(function () {
+    self.emit('connect');
+  });
 };
 
-MySocket.prototype.write = function (buffer) {
+MySocket.prototype.write = function (/* buffer */) {
   var self = this;
-  this._buffer = buffer;
   if (0 < retrys) {
-    this.emit('error', 'test error!');
     retrys -= 1;
-  } else {
-    setTimeout(function () {
-      self.emit('data', new Buffer([0xda, 0xbb, 0x02, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x92]));
-    }, 50);
+    setImmediate(function () {
+      self.emit('error', new Error('Socket Test Error!'));
+    });
+    return;
   }
+  setImmediate(function () {
+    self.emit('data', new Buffer([0xda, 0xbb, 0x02, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x92]));
+  });
 };
 
 MySocket.prototype.destroy = function () {
-  this.emit('close');
+  setImmediate(function () {
+    this.emit('close');
+  });
 };
 
 module.exports = MySocket;

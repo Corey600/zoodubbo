@@ -52,7 +52,10 @@ describe('test', function () {
     it('excute success', function (done) {
       zd.connect();
 
-      var invoker = zd.getInvoker('com.demo.Service', { version: '1.0.0' });
+      var invoker = zd.getInvoker('com.demo.Service', {
+        version: '1.0.0',
+        poolMax: 1
+      });
       var method = 'get';
       var arg1 = { $class: 'java.lang.String', $: '123456789' };
 
@@ -61,7 +64,7 @@ describe('test', function () {
         zd.close();
         return done();
       }).catch(function (err) {
-        expect(err).to.be(false);
+        expect(err).not.to.be.a(Error);
         zd.close();
         return done();
       });
@@ -79,7 +82,7 @@ describe('test', function () {
         zd.close();
         return done();
       }).catch(function (err) {
-        expect(err).to.be.a('string');
+        expect(err).to.be.a(Error);
         zd.close();
         return done();
       });
@@ -106,9 +109,9 @@ describe('test', function () {
     it('get children error', function (done) {
       mm(zookeeper, 'createClient', function (conn, opt) {
         var zp = new MyZookeeper(conn, opt);
-        zp.getChildren = function (path, cb) {
+        zp.getChildren = function (path, watcher, cb) {
           setTimeout(function () {
-            cb(true);
+            cb(new Error('asdfs'));
           }, 50);
         };
         return zp;
@@ -121,7 +124,7 @@ describe('test', function () {
       var method = 'get';
       var arg1 = { $class: 'java.lang.String', $: '123456789' };
       invoker.excute(method, [arg1], function (err, data) {
-        expect(err).to.be(true);
+        expect(err).to.be.a(Error);
         expect(data).to.be(undefined);
 
         zd.close();
@@ -132,7 +135,7 @@ describe('test', function () {
     it('get no children', function (done) {
       mm(zookeeper, 'createClient', function (conn, opt) {
         var zp = new MyZookeeper(conn, opt);
-        zp.getChildren = function (path, cb) {
+        zp.getChildren = function (path, watcher, cb) {
           setTimeout(function () {
             cb(false, []);
           }, 50);
@@ -147,7 +150,7 @@ describe('test', function () {
       var method = 'get';
       var arg1 = { $class: 'java.lang.String', $: '123456789' };
       invoker.excute(method, [arg1], function (err, data) {
-        expect(err).to.be.a('string');
+        expect(err).to.be.a(Error);
         expect(data).to.be(undefined);
 
         zd.close();
@@ -158,7 +161,7 @@ describe('test', function () {
     it('parse children error', function (done) {
       mm(zookeeper, 'createClient', function (conn, opt) {
         var zp = new MyZookeeper(conn, opt);
-        zp.getChildren = function (path, cb) {
+        zp.getChildren = function (path, watcher, cb) {
           setTimeout(function () {
             cb(false, ['xxxxx']);
           }, 50);
@@ -217,7 +220,9 @@ describe('test', function () {
       });
       // noinspection JSUnresolvedVariable
       mm(MySocket.prototype, 'destroy', function () {
-        this.emit('close', true);
+        setImmediate(function () {
+          this.emit('close', new Error());
+        });
       });
 
       var zd = ZD(null);
@@ -227,7 +232,8 @@ describe('test', function () {
       var method = 'get';
       var arg1 = { $class: 'java.lang.String', $: '123456789' };
       invoker.excute(method, [arg1], function (err, data) {
-        expect(err).to.be(true);
+        // todo
+        expect(err).not.to.be.a(Error);
         expect(data).to.be(undefined);
 
         zd.close();
@@ -263,7 +269,7 @@ describe('test', function () {
         for (var i = 0; 1000 > i; i += 1) {
           arr.push({ $class: 'int', $: i });
         }
-        codec.encodeRequest(invoker, 'get', arr);
+        codec.encodeRequest(invoker, {}, 'get', arr);
       } catch (e) {
         err = e;
       }
@@ -279,7 +285,7 @@ describe('test', function () {
         for (var i = 0; 300000 > i; i += 1) {
           arr.push({ $class: 'int', $: i });
         }
-        codec.encodeRequest(invoker, 'get', arr);
+        codec.encodeRequest(invoker, {}, 'get', arr);
       } catch (e) {
         err = e;
       }
