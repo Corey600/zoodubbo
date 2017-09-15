@@ -52,10 +52,7 @@ describe('test', function () {
     it('excute success', function (done) {
       zd.connect();
 
-      var invoker = zd.getInvoker('com.demo.Service', {
-        version: '1.0.0',
-        poolMax: 1
-      });
+      var invoker = zd.getInvoker('com.demo.Service', { version: '1.0.0' });
       var method = 'get';
       var arg1 = { $class: 'java.lang.String', $: '123456789' };
 
@@ -110,9 +107,9 @@ describe('test', function () {
       mm(zookeeper, 'createClient', function (conn, opt) {
         var zp = new MyZookeeper(conn, opt);
         zp.getChildren = function (path, watcher, cb) {
-          setTimeout(function () {
-            cb(new Error('asdfs'));
-          }, 50);
+          setImmediate(function () {
+            cb(new Error());
+          });
         };
         return zp;
       });
@@ -136,9 +133,9 @@ describe('test', function () {
       mm(zookeeper, 'createClient', function (conn, opt) {
         var zp = new MyZookeeper(conn, opt);
         zp.getChildren = function (path, watcher, cb) {
-          setTimeout(function () {
+          setImmediate(function () {
             cb(false, []);
-          }, 50);
+          });
         };
         return zp;
       });
@@ -162,9 +159,9 @@ describe('test', function () {
       mm(zookeeper, 'createClient', function (conn, opt) {
         var zp = new MyZookeeper(conn, opt);
         zp.getChildren = function (path, watcher, cb) {
-          setTimeout(function () {
+          setImmediate(function () {
             cb(false, ['xxxxx']);
-          }, 50);
+          });
         };
         return zp;
       });
@@ -218,7 +215,6 @@ describe('test', function () {
       mm(zookeeper, 'createClient', function (conn, opt) {
         return new MyZookeeper(conn, opt);
       });
-      // noinspection JSUnresolvedVariable
       mm(MySocket.prototype, 'destroy', function () {
         setImmediate(function () {
           this.emit('close', new Error());
@@ -232,7 +228,6 @@ describe('test', function () {
       var method = 'get';
       var arg1 = { $class: 'java.lang.String', $: '123456789' };
       invoker.excute(method, [arg1], function (err, data) {
-        // todo
         expect(err).not.to.be.a(Error);
         expect(data).to.be(undefined);
 
@@ -299,7 +294,7 @@ describe('test', function () {
       codec.pushChunk(new Buffer([0xda, 0xbb, 0x02, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x91, 0xc8, 0x7b]));
       codec.decodeResponse(function (err, data) {
-        expect(err).to.be(false);
+        expect(err).not.to.be.a(Error);
         expect(data).to.be(123);
         done();
       });
@@ -311,7 +306,7 @@ describe('test', function () {
       codec.pushChunk(new Buffer([0xaa, 0xbb, 0x02, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x92]));
       codec.decodeResponse(function (err, data) {
-        expect(err).to.be.a('string');
+        expect(err).to.be.a(Error);
         expect(data).to.be(undefined);
         done();
       });
@@ -323,7 +318,7 @@ describe('test', function () {
       codec.pushChunk(new Buffer([0xda, 0xbb, 0x22, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x92]));
       codec.decodeResponse(function (err, data) {
-        expect(err).to.be(false);
+        expect(err).not.to.be.a(Error);
         expect(data).to.be(undefined);
         done();
       });
@@ -335,7 +330,7 @@ describe('test', function () {
       codec.pushChunk(new Buffer([0xda, 0xbb, 0x03, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x92]));
       codec.decodeResponse(function (err, data) {
-        expect(err).to.be.a('string');
+        expect(err).to.be.a(Error);
         expect(data).to.be(undefined);
         done();
       });
@@ -347,7 +342,7 @@ describe('test', function () {
       codec.pushChunk(new Buffer([0xda, 0xbb, 0x02, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x92]));
       codec.decodeResponse(function (err, data) {
-        expect(err).to.be.a('string');
+        expect(err).to.be.a(Error);
         expect(data).to.be(undefined);
         done();
       });
@@ -383,7 +378,7 @@ describe('test', function () {
       codec.pushChunk(new Buffer([0xda, 0xbb, 0x02, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x92]));
       codec.decodeResponse(function (err, data) {
-        expect(err).to.be(false);
+        expect(err).not.to.be.a(Error);
         expect(data).to.be(undefined);
         done();
       });
@@ -395,7 +390,8 @@ describe('test', function () {
       codec.pushChunk(new Buffer([0xda, 0xbb, 0x02, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x90, 0xc8, 0x7b]));
       codec.decodeResponse(function (err, data) {
-        expect(err).to.be(123);
+        expect(err).to.be.a(Error);
+        expect(err.message).to.be('123');
         expect(data).to.be(undefined);
         done();
       });

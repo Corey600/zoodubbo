@@ -92,6 +92,7 @@ ZD.prototype.getInvoker = function (path, opt) {
 
 /**
  * Expose `Invoker`. To create a Invoker with URIs directly.
+ *
  * @type {Invoker}
  */
 ZD.Invoker = Invoker;
