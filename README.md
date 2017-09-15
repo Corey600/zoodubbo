@@ -160,13 +160,13 @@ Also you can create Invoker instance by URIs of providers directly.
     * `path` {*String*} - Path of service.
     * `dubbo` {*String*} - Dubbo version information.
 
-    *The other content is same as the `opt` in `getInvoker(path[, opt])`*
+    *The other content is same as the `opt` in [getInvoker(path[, opt])](#invoker-getinvokerpath-opt)*
 
 *Example*
 
 ```javascript
 var invoker = new ZD.Invoker(
-  'dubbo://127.0.0.1:20880/com.demo.DemoService?anyhost=true&interface=com.demo.DemoService&methods=sayHello&side=provider',
+  'dubbo://127.0.0.1:20880/com.demo.DemoService?interface=com.demo.DemoService&methods=sayHello',
   { version: '0.0.0' }
 );
 ```
