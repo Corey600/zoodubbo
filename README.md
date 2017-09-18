@@ -16,7 +16,9 @@ to connect Dubbo service by
 - Invoke Dubbo service as a Customer.
 - Use Zookeeper as the Dubbo Registration Center.
 - Only supports the use of the default hessian2 protocol for serialization and deserialization.
-- It is not very friendly to support the return value containing an enum type. 
+- It is not very friendly to support the return value containing an enum type.
+- Use [Random LoadBalance](https://dubbo.gitbooks.io/dubbo-user-book/demos/loadbalance.html) to choose Provider.
+- Use [generic-pool](https://github.com/coopernurse/node-pool) to manage net.Socket.
 
 ## Installation
 
@@ -59,7 +61,7 @@ invoker.excute(method, [arg1], function (err, data) {
 
 *Arguments*
 
-* conf {*Object*} - An object to set the instance options. Currently available options are:
+* conf {*String|Object*} - A string of host:port pairs like `conn`. Or an object to set the instance options. Currently available options are:
 
     * `dubbo` {*String*} - Dubbo version information.
 
@@ -72,6 +74,10 @@ invoker.excute(method, [arg1], function (err, data) {
 *Example*
 
 ```javascript
+// use a string of host:port pairs
+var zd = new ZD('localhost:2181,localhost:2182');
+
+// use an object to set the instance options
 var zd = new ZD({
     conn: 'localhost:2181,localhost:2182',
     dubbo: '2.5.3'
@@ -118,7 +124,7 @@ zd.client.close();
 
 ----
 
-#### Invoker getInvoker(path, opt)
+#### Invoker getInvoker(path[, opt])
 
 *Arguments*
 
@@ -127,6 +133,10 @@ zd.client.close();
 
     * `version` {*String*} - Service version information.
     * `timeout` {*Number*} - The timeout (in milliseconds) to excute.
+
+    *The following content could reference: [generic-pool](https://github.com/coopernurse/node-pool)*
+    * `poolMax` {*Number*} - Maximum number of net.Socket to create from pool at any given time. Defaults to 1 .
+    * `poolMin` {*Number*} - Minimum number of net.Socket to keep in pool at any given time. If this is set >= poolMax, the pool will silently set the min to equal max. Defaults to 0 .
 
 *Example*
 
@@ -138,15 +148,38 @@ var invoker = zd.getInvoker('com.demo.Service', {
 
 ----
 
-## Invoker
+### new Invoker(zk[, opt])
 
-### void excute(method, args, cb)
+Also you can create Invoker instance by URIs of providers directly.
+
+*Arguments*
+
+* zk {*Client|String|Array*} - The ZD instance or the URIs of providers.
+* opt {*Object*} - An object to set the instance options. Currently available options are:
+
+    * `path` {*String*} - Path of service.
+    * `dubbo` {*String*} - Dubbo version information.
+
+    *The other content is same as the `opt` in [getInvoker(path[, opt])](#invoker-getinvokerpath-opt)*
+
+*Example*
+
+```javascript
+var invoker = new ZD.Invoker(
+  'dubbo://127.0.0.1:20880/com.demo.DemoService?interface=com.demo.DemoService&methods=sayHello',
+  { version: '0.0.0' }
+);
+```
+
+----
+
+#### void excute(method, args[, cb])
 
 *Arguments*
 
 * method {*String*} - Method to excute.
 * args {*Array*} - Argument list.
-* `[`cb(err, data)`]` {*Function*} - The data is the returned value. When the cb is undefined, the function return a Promise instance.
+* cb(err, data) {*Function*} - The data is the returned value. When the cb is undefined, the function return a Promise instance.
 
 *Example*
 
@@ -173,12 +206,6 @@ invoker.excute(method, [arg1])
 ```
 
 ----
-
-## Thanks
-
-Thank 
-[node-zookeeper-dubbo](https://github.com/p412726700/node-zookeeper-dubbo)
-provide reference and thoughts.
 
 ## License
 

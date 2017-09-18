@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "./rules/best-practices.js",
+    "./rules/errors.js",
+    "./rules/node.js",
+    "./rules/style.js",
+    "./rules/variables.js"
+  ],
+  "env": {
+    "node": true,
+    "mocha": true
+  },
+  "globals": {
+    "Promise": true
+  }
+}
