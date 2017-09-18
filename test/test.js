@@ -403,18 +403,23 @@ describe('test', function () {
     it('destroy client', function (done) {
       var pool = createPool('127.0.0.1', 8080);
       var resource = pool.acquire();
-      resource.then(function (client) {
-        return pool.destroy(client);
-      }).then(function () {
-        return pool.drain();
-      }).then(function () {
-        return pool.clear();
-      }).then(function () {
-        done();
-      }).catch(function (err) {
-        expect(err).not.to.be.a(Error);
-        done();
-      });
+      resource
+        .then(function (client) {
+          return pool.destroy(client);
+        })
+        .then(function () {
+          return pool.drain();
+        })
+        .then(function () {
+          return pool.clear();
+        })
+        .then(function () {
+          done();
+        })
+        .catch(function (err) {
+          expect(err).not.to.be.a(Error);
+          done();
+        });
     });
   });
 });
