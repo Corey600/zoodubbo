@@ -33,7 +33,7 @@ MyZookeeper.prototype.getChildren = function (path, watcher, callback) {
       cb(false, [
         'override%3A%2F%2F127.0.0.1%3A20880%2Fcom.demo.Service%3Fcategory%3Dconfigurators%26dynamic%3Dfalse%26enabled%3Dtrue%26weight%3D20',
         'override%3A%2F%2F127.0.0.1%3A20881%2Fcom.demo.Service%3Fcategory%3Dconfigurators%26dynamic%3Dfalse%26enabled%3Dtrue%26weight%3D200',
-        'override%3A%2F%2F127.0.0.1%3A20881%2Fcom.demo.Service%3Fcategory%3Dconfigurators%26dynamic%3Dfalse%26enabled%3Dfalse%26weight%3D300',
+        'override%3A%2F%2F127.0.0.1%3A20881%2Fcom.demo.Service%3Fcategory%3Dconfigurators%26dynamic%3Dfalse%26enabled%3Dfalse%26weight%3D300'
       ]);
     }
   });
