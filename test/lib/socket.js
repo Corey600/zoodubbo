@@ -37,8 +37,9 @@ MySocket.prototype.write = function (/* buffer */) {
 };
 
 MySocket.prototype.destroy = function () {
+  var self = this;
   setImmediate(function () {
-    this.emit('close');
+    self.emit('close');
   });
 };
 
